@@ -1,0 +1,21 @@
+{% extends "partials/base.html" %}
+
+{% block nav %}
+<a class="nav-link h4" href="courses">Courses</a>
+<a class="nav-link h4" href="programs">Programs</a>
+<a class="nav-link h4" href="batches">Batches</a>
+<a class="nav-link h4" href="units">Units</a>
+<a class="nav-link h4" href="students">Students</a>
+<a class="nav-link h4" href="lecturers">Lecturers</a>
+<a class="nav-link h4" href="exams">Exams</a> 
+{% endblock %}
+
+{% block content %}
+
+<ul>
+    {% for faculty in faculties %}
+        <li>{{ faculty}}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Add the Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style/base.css' %}">
+</head>
+<body>    
+    <header>        
+        <nav class="nav rounded vh-20 d-flex flex-column flex-md-row align-items-center">          
+            {% load static %}
+            <img src = "{% static 'images/zetech.png' %}" class = "img-fluid">  
+            <div style="margin: 0 auto;">
+                <p class="h1">Staff Portal</p>
+            </div> 
+            <button class="btn btn-danger ml-auto" style="margin-right: 10px;">Logout</button>            
+           
+            <div class="d-flex flex-wrap">
+                <a class="nav-link h4" href="http://127.0.0.1:8000/staff/faculties/">Faculties</a>
+                <a class="nav-link h4" href="courses">Courses</a>
+                <a class="nav-link h4" href="programs">Programs</a>
+                <a class="nav-link h4" href="batches">Batches</a>
+                <a class="nav-link h4" href="units">Units</a>
+                <a class="nav-link h4" href="students">Students</a>
+                <a class="nav-link h4" href="lecturers">Lecturers</a>
+                <a class="nav-link h4" href="exams">Exams</a>
+            </div>           
+                       
+        </nav>
+        <nav>
+        </nav>
+    </header>  
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+
+    <!-- Add the Bootstrap JS and jQuery scripts at the end of your HTML body -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>  
+    <script>
+    </script>
+</body>
+</html>
