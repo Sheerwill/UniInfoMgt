@@ -17,18 +17,88 @@
 
 {% block content %}
 <div class="container">
-    <form action="" class="col-6 mx-auto mt-3 mt-md-4"> <!-- Use col-6 to occupy half of the page width, and mx-auto for centering -->
+    <form id="searchForm" class="col-6 mx-auto mt-3 mt-md-4"> <!-- Use col-6 to occupy half of the page width, and mx-auto for centering -->
         <div class="input-group mb-3">
             <input type="text" class="form-control form-control-lg" id="searchQuery" placeholder="Search Course ID...">
             <button type="submit" class="input-group-text btn-success">
                 <i class="bi bi-search me-2"></i> Search
             </button>
         </div>
-    </form>
+    </form> 
+    <div id="noResultsAlert" class="alert alert-warning" style="display: none;">
+        No results found.
+    </div> 
+    <div id="results-table-container">
+        
+    </div>    
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('searchForm');
+        const noResultsAlert = document.getElementById('noResultsAlert');
     
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission            
+    
+            const searchQuery = document.getElementById('searchQuery').value;
+    
+            fetch(`/search/?search_query=${searchQuery}`)
+                .then(response => response.json())
+                .then(data => {
+                    if ('results' in data) {
+                        updateTable(data.results);
+                        if (data.results.length === 0) {
+                            // Show the alert if no results are found
+                            noResultsAlert.classList.add('show');
+                        } else {
+                            // Hide the alert if results are found
+                            noResultsAlert.classList.remove('show');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    
+        // Function to update the table with results
+        function updateTable(results) {
+            var tableContainer = document.getElementById("results-table-container");
+            var table = document.createElement("table");
+            table.className = "table table-bordered"; // You can add Bootstrap table classes here
+    
+            var headerRow = table.insertRow(0);
+            var headers = ["Unit Code", "Student Name", "Percentage", "Grade", "Remarks"];
+            for (var i = 0; i < headers.length; i++) {
+                var headerCell = headerRow.insertCell(i);
+                headerCell.innerHTML = headers[i];
+            }
+    
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                var row = table.insertRow(i + 1);
+    
+                var unitCodeCell = row.insertCell(0);
+                unitCodeCell.innerHTML = result.unit_code;
+    
+                var studentNameCell = row.insertCell(1);
+                studentNameCell.innerHTML = result.student_id;
+    
+                var percentageCell = row.insertCell(2);
+                percentageCell.innerHTML = result.percentage;
+    
+                var gradeCell = row.insertCell(3);
+                gradeCell.innerHTML = result.grade;
+    
+                var remarksCell = row.insertCell(4);
+                remarksCell.innerHTML = result.remarks;
+            }
+    
+            tableContainer.innerHTML = ""; // Clear any previous table
+            tableContainer.appendChild(table);
+        }
+    });
 </script>
 
 {% endblock %}

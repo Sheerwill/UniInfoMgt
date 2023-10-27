@@ -53,15 +53,27 @@ def signup(request):
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
 
-def search_exams(request):
-    if request.method == "GET":
+@login_required
+@user_passes_test(is_staff)
+def search_exams(request):    
         search_query = request.GET.get("search_query")
         if search_query:
-            results = Exams.objects.filter(exam_id__icontains=search_query)
+            # Perform a search based on the related model's attribute
+            results = Exams.objects.filter(unit_id__unit_code__exact=search_query)
         else:
-            results = []  # Return an empty list when no search query is provided
+            # If no query provided
+            results = []
 
-        # Serialize the queryset results to JSON
-        results_data = serializers.serialize('json', results)
+        if results:
+            # Serialize the queryset results to JSON
+            results_data = [{
+                'unit_code': result.unit_id.unit_code,
+                'student_id': result.student_id.student_name,
+                'percentage': result.percentage,
+                'grade': result.grade,
+                'remarks': result.remarks
+            } for result in results]
+        else:
+            results_data = []  # Empty list if no results
 
-        return JsonResponse(results_data, safe=False)
+        return JsonResponse({'results': results_data})   
