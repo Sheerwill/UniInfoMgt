@@ -25,7 +25,7 @@
             </button>
         </div>
     </form> 
-    <div id="noResultsAlert" class="alert alert-warning" style="display: none;">
+    <div id="noResultsAlert" class="alert alert-warning"  style="display: none;">
         No results found.
     </div> 
     <div id="results-table-container">
@@ -47,13 +47,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if ('results' in data) {
-                        updateTable(data.results);
+                        updateTable(data.results);                        
                         if (data.results.length === 0) {
                             // Show the alert if no results are found
-                            noResultsAlert.classList.add('show');
+                            noResultsAlert.style.display = 'block';                                                        
+                            console.log('yaay2');
                         } else {
                             // Hide the alert if results are found
-                            noResultsAlert.classList.remove('show');
+                            noResultsAlert.style.display = 'none';                           
                         }
                     }
                 })
@@ -64,41 +65,103 @@
     
         // Function to update the table with results
         function updateTable(results) {
+            
             var tableContainer = document.getElementById("results-table-container");
             var table = document.createElement("table");
             table.className = "table table-bordered"; // You can add Bootstrap table classes here
-    
+        
             var headerRow = table.insertRow(0);
-            var headers = ["Unit Code", "Student Name", "Percentage", "Grade", "Remarks"];
+            var headers = ["Unit Code", "Student Name", "Percentage", "Grade", "Remarks", "Actions"]; // Include a new "Actions" column
             for (var i = 0; i < headers.length; i++) {
                 var headerCell = headerRow.insertCell(i);
                 headerCell.innerHTML = headers[i];
             }
-    
+        
             for (var i = 0; i < results.length; i++) {
                 var result = results[i];
                 var row = table.insertRow(i + 1);
-    
+        
                 var unitCodeCell = row.insertCell(0);
                 unitCodeCell.innerHTML = result.unit_code;
-    
+        
                 var studentNameCell = row.insertCell(1);
                 studentNameCell.innerHTML = result.student_id;
-    
+        
                 var percentageCell = row.insertCell(2);
                 percentageCell.innerHTML = result.percentage;
-    
+        
                 var gradeCell = row.insertCell(3);
                 gradeCell.innerHTML = result.grade;
-    
+        
                 var remarksCell = row.insertCell(4);
                 remarksCell.innerHTML = result.remarks;
+        
+                // Add an "Edit" button to each row
+                var editCell = row.insertCell(5);
+                var editButton = document.createElement('button');
+                editButton.className = 'edit-button btn btn-primary';
+                editButton.innerText = 'Edit';
+                editCell.appendChild(editButton);
+                
+                // Add "Save" and "Cancel" buttons to each row (initially hidden)
+                var saveCell = row.insertCell(6);
+                var saveButton = document.createElement('button');
+                saveButton.className = 'save-button btn btn-success';
+                saveButton.innerText = 'Save';
+                saveCell.appendChild(saveButton);
+                saveButton.style.display = 'none'; // Initially hidden
+        
+                var cancelCell = row.insertCell(7);
+                var cancelButton = document.createElement('button');
+                cancelButton.className = 'cancel-button btn btn-secondary';
+                cancelButton.innerText = 'Cancel';
+                cancelCell.appendChild(cancelButton);
+                cancelButton.style.display = 'none'; // Initially hidden
+        
+                // Add hidden input fields for editing
+                var inputs = [];
+                for (var j = 0; j < headers.length - 1; j++) {
+                    var input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = row.cells[j].innerHTML;
+                    input.setAttribute('disabled', 'true'); // Initially disabled
+                    row.cells[j].innerHTML = ''; // Clear the cell content
+                    row.cells[j].appendChild(input);
+                    inputs.push(input);
+                }
+        
+                // Event listeners for handling edits
+                editButton.addEventListener('click', function () {                    
+                    // Enable input fields for editing
+                    for (var j = 0; j < inputs.length; j++) {
+                        inputs[j].removeAttribute('disabled');
+                    }
+                
+                    // Show the "Save" and "Cancel" buttons
+                    saveButton.style.display = 'inline';
+                    cancelButton.style.display = 'inline';
+                
+                    // Hide the "Edit" button
+                    editButton.style.display = 'none';
+                });
+        
+                // Event listeners for handling cancels
+                cancelButton.addEventListener('click', function () {
+                    // Handle cancel
+                });
+        
+                // Event listeners for handling saves
+                saveButton.addEventListener('click', function () {
+                    // Handle save
+                });
             }
-    
-            tableContainer.innerHTML = ""; // Clear any previous table
+        
+            tableContainer.innerHTML = ''; // Clear any previous table
             tableContainer.appendChild(table);
         }
     });
+
+    
 </script>
 
 {% endblock %}
