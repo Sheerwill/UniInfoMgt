@@ -1,18 +1,35 @@
 {% extends "partials/base.html" %}
 
-{% block nav %}
-<a class="nav-link h4" href="faculties/"> Faculties</a>
-<a class="nav-link h4" href="courses">Courses</a>
-<a class="nav-link h4" href="programs">Programs</a>
-<a class="nav-link h4" href="batches">Batches</a>
-<a class="nav-link h4" href="units">Units</a>
-<a class="nav-link h4" href="students">Students</a>
-<a class="nav-link h4" href="lecturers">Lecturers</a>
-<a class="nav-link h4" href="exams">Exams</a> 
+{% block style %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'style/staff_dashboard.css' %}">
+{% endblock %}
 
+{% block nav %}
+<div style="margin: 0 auto;">
+    <p class="h1">Exams Staff Portal</p>
+</div> 
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button class="btn btn-danger ml-auto" style="margin-right: 10px;" type="submit">Logout</button>
+  </form>  
 {% endblock %}
 
 {% block content %}
+<div class="container">
+    <form action="" class="col-6 mx-auto mt-3 mt-md-4"> <!-- Use col-6 to occupy half of the page width, and mx-auto for centering -->
+        <div class="input-group mb-3">
+            <input type="text" class="form-control form-control-lg" id="searchQuery" placeholder="Search Course ID...">
+            <button type="submit" class="input-group-text btn-success">
+                <i class="bi bi-search me-2"></i> Search
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    
+</script>
 
 {% endblock %}
 

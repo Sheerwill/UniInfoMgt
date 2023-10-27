@@ -4,13 +4,5 @@
 }
 
 .img-fluid{
-    max-height: 20vh;
-}
-
-.nav-link {
-    color: white;
-}
-
-.nav-link:hover {
-    color: #ffc107; /* Change to the desired hover color */
+    max-height: 15vh;
 }

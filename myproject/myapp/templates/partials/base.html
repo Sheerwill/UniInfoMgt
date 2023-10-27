@@ -5,30 +5,19 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'style/base.css' %}">
+    {% block style %}
+    
+    {%endblock%}
 </head>
 <body>    
     <header>        
-        <nav class="nav rounded vh-20 d-flex flex-column flex-md-row align-items-center">          
+        <nav class="nav rounded d-flex flex-column flex-md-row align-items-center">          
             {% load static %}
-            <img src = "{% static 'images/zetech.png' %}" class = "img-fluid">  
-            <div style="margin: 0 auto;">
-                <p class="h1">Staff Portal</p>
-            </div> 
-            <button class="btn btn-danger ml-auto" style="margin-right: 10px;">Logout</button>            
-           
-            <div class="d-flex flex-wrap">
-                <a class="nav-link h4" href="http://127.0.0.1:8000/staff/faculties/">Faculties</a>
-                <a class="nav-link h4" href="courses">Courses</a>
-                <a class="nav-link h4" href="programs">Programs</a>
-                <a class="nav-link h4" href="batches">Batches</a>
-                <a class="nav-link h4" href="units">Units</a>
-                <a class="nav-link h4" href="students">Students</a>
-                <a class="nav-link h4" href="lecturers">Lecturers</a>
-                <a class="nav-link h4" href="exams">Exams</a>
-            </div>           
+            <img src = "{% static 'images/zetech.png' %}" class = "img-fluid">
+            {% block nav %}
+
+            {% endblock %}    
                        
-        </nav>
-        <nav>
         </nav>
     </header>  
     <body>

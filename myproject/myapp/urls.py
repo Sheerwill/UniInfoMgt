@@ -1,15 +1,13 @@
 from django.urls import path
 from .views import CustomLoginView, staff_dashboard_view, student_dashboard_view, signup
-from .views import FacultyListView, FacultyCreateView, FacultyUpdateView, FacultyDeleteView
+#from .views import FacultyListView, FacultyCreateView, FacultyUpdateView, FacultyDeleteView
+from .views import search_exams, custom_logout
 
 urlpatterns = [
     path('', CustomLoginView.as_view(), name='custom_login'),    
     path('student_dashboard/', student_dashboard_view, name='student_dashboard'),
     path('signup/', signup, name='signup'),
-
-    path('staff/', staff_dashboard_view, name='staff_dashboard'),
-    path('staff/faculties/', FacultyListView.as_view(), name='faculty_list'),
-    path('staff/faculties/add/', FacultyCreateView.as_view(), name='faculty_add'),
-    path('staff/faculties/<int:pk>/', FacultyUpdateView.as_view(), name='faculty_update'),
-    path('staff/faculties/<int:pk>/delete/', FacultyDeleteView.as_view(), name='faculty_delete'),
+    path('staff/', staff_dashboard_view, name='staff_dashboard'), 
+    path('search/', search_exams, name='search_exams'), 
+    path('logout/', custom_logout, name='logout'),     
 ]

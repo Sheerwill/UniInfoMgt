@@ -1,10 +1,13 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from .forms import SignupForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Faculties
+from .models import Exams
+from django.http import JsonResponse, request
+from django.core import serializers
+from django.urls import reverse
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
@@ -15,7 +18,12 @@ class CustomLoginView(LoginView):
         if self.request.user.is_staff:
             return redirect('staff_dashboard')  # Redirect to staff dashboard
         else:
-            return redirect('student_dashboard')  # Redirect to student dashboard
+            return redirect('student_dashboard')  # Redirect to student dashboard        
+
+
+def custom_logout(request):
+    logout(request)
+    return redirect(reverse('custom_login'))
 
 # Define a custom check to identify staff users
 def is_staff(user):
@@ -45,25 +53,15 @@ def signup(request):
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
 
+def search_exams(request):
+    if request.method == "GET":
+        search_query = request.GET.get("search_query")
+        if search_query:
+            results = Exams.objects.filter(exam_id__icontains=search_query)
+        else:
+            results = []  # Return an empty list when no search query is provided
 
-class FacultyListView(ListView):
-    model = Faculties
-    template_name = 'faculty_list.html'
-    context_object_name = 'faculties'
+        # Serialize the queryset results to JSON
+        results_data = serializers.serialize('json', results)
 
-class FacultyCreateView(CreateView):
-    model = Faculties
-    template_name = 'faculty_form.html'
-    fields = '__all__'
-    success_url = 'staff/' 
-
-class FacultyUpdateView(UpdateView):
-    model = Faculties
-    template_name = 'faculty_form.html'
-    fields = '__all__'
-    success_url = 'staff/'
-
-class FacultyDeleteView(DeleteView):
-    model = Faculties
-    template_name = 'faculty_confirm_delete.html'
-    success_url = 'staff/'
+        return JsonResponse(results_data, safe=False)

@@ -1,17 +1,18 @@
 from django.contrib import admin
-from .models import Faculties, Courses, Programs, Batches
+from .models import Faculties, Courses, Programs,Time, Batches, Students, Lecturers, Units, Exams, StudentClassification
 
-class FacultiesAdmin(admin.ModelAdmin):
-    # Define fields to be displayed in the admin panel
-    list_display = ('faculty_code', 'faculty_name')
 
-    # Define fields that can be left blank in the admin panel
-    exclude = ('faculty_head_id', 'student_id', 'lecturer_id', 'course_id')
 
 # Register your models here.
-admin.site.register(Faculties, FacultiesAdmin)
+admin.site.register(Faculties)
 admin.site.register(Courses)
 admin.site.register(Programs)
+admin.site.register(Time)
 admin.site.register(Batches)
+admin.site.register(Students)
+admin.site.register(Lecturers)
+admin.site.register(Units)
+admin.site.register(Exams)
+admin.site.register(StudentClassification)
 
 
