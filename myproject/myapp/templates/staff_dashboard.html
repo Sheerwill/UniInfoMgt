@@ -30,7 +30,8 @@
     </div> 
     <div id="results-table-container" class="table-container d-flex justify-content-center">
         
-    </div>    
+    </div> 
+    <button id="post-button" class="btn btn-primary btn-lg float-right" style = "display: none">Post</button>   
 </div>
 
 <script>
@@ -65,95 +66,50 @@
     
         // Function to update the table with results
         function updateTable(results) {
-            
             var tableContainer = document.getElementById("results-table-container");
             var table = document.createElement("table");
-            table.className = "table table-bordered"; // You can add Bootstrap table classes here
+            table.className = "table table-bordered"; // Remove the table-responsive class
         
             var headerRow = table.insertRow(0);
-            var headers = ["Unit Code", "Student Name", "Percentage", "Grade", "Remarks", "Actions"]; // Include a new "Actions" column
+            var headers = ["Unit Code", "Student Name", "Percentage", "Grade", "Remarks"];
+            var colWidths = ["col-md-2", "col-md-3", "col-md-2", "col-md-2", "col-md-3"]; // Adjust column widths
+        
             for (var i = 0; i < headers.length; i++) {
                 var headerCell = headerRow.insertCell(i);
                 headerCell.innerHTML = headers[i];
+        
+                // Set column widths using Bootstrap grid classes
+                headerCell.className = colWidths[i];
             }
         
             for (var i = 0; i < results.length; i++) {
                 var result = results[i];
                 var row = table.insertRow(i + 1);
-        
+            
                 var unitCodeCell = row.insertCell(0);
                 unitCodeCell.innerHTML = result.unit_code;
-        
+            
                 var studentNameCell = row.insertCell(1);
                 studentNameCell.innerHTML = result.student_id;
-        
+            
                 var percentageCell = row.insertCell(2);
                 percentageCell.innerHTML = result.percentage;
-        
+                percentageCell.setAttribute('contenteditable', 'true'); // Make the Percentage field editable
+                            
                 var gradeCell = row.insertCell(3);
                 gradeCell.innerHTML = result.grade;
-        
+            
                 var remarksCell = row.insertCell(4);
                 remarksCell.innerHTML = result.remarks;
-        
-                // Add an "Edit" button to each row
-                var editCell = row.insertCell(5);
-                var editButton = document.createElement('button');
-                editButton.className = 'edit-button btn btn-primary';
-                editButton.innerText = 'Edit';
-                editCell.appendChild(editButton);
                 
-                // Add "Save" and "Cancel" buttons to each row (initially hidden)
-                var saveCell = row.insertCell(6);
-                var saveButton = document.createElement('button');
-                saveButton.className = 'save-button btn btn-success';
-                saveButton.innerText = 'Save';
-                saveCell.appendChild(saveButton);
-                saveButton.style.display = 'none'; // Initially hidden
-        
-                var cancelCell = row.insertCell(7);
-                var cancelButton = document.createElement('button');
-                cancelButton.className = 'cancel-button btn btn-secondary';
-                cancelButton.innerText = 'Cancel';
-                cancelCell.appendChild(cancelButton);
-                cancelButton.style.display = 'none'; // Initially hidden
-        
-                // Add hidden input fields for editing
-                var inputs = [];
-                for (var j = 0; j < headers.length - 1; j++) {
-                    var input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = row.cells[j].innerHTML;
-                    input.setAttribute('disabled', 'true'); // Initially disabled
-                    row.cells[j].innerHTML = ''; // Clear the cell content
-                    row.cells[j].appendChild(input);
-                    inputs.push(input);
-                }
-        
-                // Event listeners for handling edits
-                editButton.addEventListener('click', function () {                    
-                    // Enable input fields for editing
-                    for (var j = 0; j < inputs.length; j++) {
-                        inputs[j].removeAttribute('disabled');
-                    }
-                
-                    // Show the "Save" and "Cancel" buttons
-                    saveButton.style.display = 'inline';
-                    cancelButton.style.display = 'inline';
-                
-                    // Hide the "Edit" button
-                    editButton.style.display = 'none';
-                });
-        
-                // Event listeners for handling cancels
-                cancelButton.addEventListener('click', function () {
-                    // Handle cancel
-                });
-        
-                // Event listeners for handling saves
-                saveButton.addEventListener('click', function () {
-                    // Handle save
-                });
+                console.log(result.id)
+                row.setAttribute('data-record-id', result.id);
+            }
+            
+            if (table.rows.length > 1) {
+                // Show the "Post" button
+                var postButton = document.getElementById("post-button");
+                postButton.style.display = "block";
             }
         
             tableContainer.innerHTML = ''; // Clear any previous table
@@ -161,6 +117,59 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add a click event listener to the "Post" button
+        var postButton = document.getElementById("post-button");
+        postButton.addEventListener('click', function () {
+            var rows = document.querySelectorAll("table tr[data-record-id]"); // Get all rows with data-record-id attribute
+            var data = [];
+    
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var recordId = row.getAttribute('data-record-id');
+                var percentage = row.cells[2].textContent; // Assuming the "Percentage" cell is the third cell (index 2)
+    
+                // Call a separate function to push the data
+                pushData(data, recordId, percentage);
+            }
+    
+            // Log the collected data once, after the loop has finished
+            console.log(data);
+    
+            // Send the data to your Django endpoint using fetch
+            fetch('http://127.0.0.1:8000/post_percentages/', {
+                // Rest of your fetch code...
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Include your CSRF token
+            },
+            body: JSON.stringify({ data: data }),
+            })
+            .then(response => response.json())            
+            .then(data => {
+                if (data.success) {
+                    alert('Percentages saved successfully.');
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    
+    // Define a function to push data into the array
+    function pushData(data, recordId, percentage) {
+        data.push({ record_id: recordId, percentage: percentage });
+    }
+
+    function getCookie(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
     
 </script>
 

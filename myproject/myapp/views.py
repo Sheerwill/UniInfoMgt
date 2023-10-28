@@ -8,6 +8,10 @@ from .models import Exams
 from django.http import JsonResponse, request
 from django.core import serializers
 from django.urls import reverse
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
@@ -56,24 +60,45 @@ def signup(request):
 @login_required
 @user_passes_test(is_staff)
 def search_exams(request):    
-        search_query = request.GET.get("search_query")
-        if search_query:
-            # Perform a search based on the related model's attribute
-            results = Exams.objects.filter(unit_id__unit_code__exact=search_query)
-        else:
-            # If no query provided
-            results = []
+    search_query = request.GET.get("search_query")
+    if search_query:
+        # Perform a search based on the related model's attribute
+        results = Exams.objects.filter(unit_id__unit_code__exact=search_query)
+    else:
+        # If no query provided
+        results = []
 
-        if results:
-            # Serialize the queryset results to JSON
-            results_data = [{
-                'unit_code': result.unit_id.unit_code,
-                'student_id': result.student_id.student_name,
-                'percentage': result.percentage,
-                'grade': result.grade,
-                'remarks': result.remarks
-            } for result in results]
-        else:
-            results_data = []  # Empty list if no results
+    if results:
+        # Serialize the queryset results to JSON
+        results_data = [{
+            'id': result.id,  # Include the ID field
+            'unit_code': result.unit_id.unit_code,
+            'student_id': result.student_id.student_name,
+            'percentage': result.percentage,
+            'grade': result.grade,
+            'remarks': result.remarks
+        } for result in results]
+    else:
+        results_data = []  # Empty list if no results
 
-        return JsonResponse({'results': results_data})   
+    return JsonResponse({'results': results_data})  
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PostPercentagesView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body.decode('utf-8'))  # Parse the JSON data            
+            for item in data["data"]:
+                print(json.dumps(data, indent=4))                
+                record_id = int(item['record_id'])
+                percentage = int(item['percentage'])
+
+                # Find the corresponding Exams record using the record_id
+                exam = Exams.objects.get(pk=record_id)
+                exam.percentage = percentage  # Update the percentage field
+                exam.save()  # Save the changes
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)})

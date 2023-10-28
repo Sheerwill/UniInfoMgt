@@ -127,11 +127,8 @@ class Exams(models.Model):
     grade = models.CharField(max_length=4, choices=[('', None), ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E')], blank=True, default=None, editable=False)
     remarks = models.CharField(max_length=100, blank=True, editable=False)
 
+    
     def save(self, *args, **kwargs):
-        # Check if an entry with the same unit_id and student_id already exists
-        if Exams.objects.filter(unit_id=self.unit_id, student_id=self.student_id).exists():
-            raise IntegrityError("An entry with the same unit and student already exists.")
-        
         # Calculate grade and remarks
         if self.percentage is not None:
             student = self.student_id
