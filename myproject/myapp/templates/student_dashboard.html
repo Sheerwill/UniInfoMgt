@@ -36,14 +36,34 @@
               <i class="bi bi-search me-2"></i> Search
             </button>
         </div>
-    </div>      
- 
-    <div id="noResultsAlert" class="alert alert-warning"  style="display: none;">
-        No results found.
     </div> 
-    <div id="results-table-container" class="table-container d-flex justify-content-center">
-        
-    </div> 
-    <button id="post-button" class="btn btn-primary btn-lg float-right" style = "display: none">Post</button>   
+
 </div>
+<div class="mx-auto">
+    <table class="table" style="display: none;">
+        <thead>
+            <tr>
+                <th>Student Number</th>
+                <th>Unit Name</th>
+                <th>Grade</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exams %}
+                <tr>
+                    <td>{{ exam.student_id.student_number }}</td>
+                    <td>{{ exam.unit_id.unit_name }}</td>
+                    <td>{{ exam.grade }}</td>
+                    <td>{{ exam.remarks }}</td>
+                    </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No results found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>        
+</div>        
+
 {% endblock %}

@@ -11,4 +11,5 @@ urlpatterns = [
     path('search/', search_exams, name='search_exams'), 
     path('logout/', custom_logout, name='logout'),   
     path('post_percentages/', PostPercentagesView.as_view(), name='post_percentages'),  
+    path('search-exams/', search_exams, name='search_exams'), #For students
 ]

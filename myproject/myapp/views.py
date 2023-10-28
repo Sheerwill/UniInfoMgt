@@ -12,6 +12,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
+from django.db.models import Q
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
@@ -103,3 +104,17 @@ class PostPercentagesView(View):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'error': str(e)})
+
+@login_required       
+def search_exams(request):
+    query = request.GET.get('q')
+    
+    if query:
+        exams = Exams.objects.filter(
+            Q(student_id__student_number__iexact=query) &
+            Q(unit_id__time_id__time_code__iexact=query)
+        )
+    else:
+        exams = Exams.objects.all()
+
+    return render(request, 'your_template.html', {'exams': exams})
