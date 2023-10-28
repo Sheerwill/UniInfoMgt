@@ -105,16 +105,36 @@ class PostPercentagesView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)})
 
-@login_required       
-def search_exams(request):
-    query = request.GET.get('q')
-    
-    if query:
-        exams = Exams.objects.filter(
-            Q(student_id__student_number__iexact=query) &
-            Q(unit_id__time_id__time_code__iexact=query)
-        )
-    else:
-        exams = Exams.objects.all()
 
-    return render(request, 'your_template.html', {'exams': exams})
+@login_required
+def search_exams(request):
+    if request.method == "POST":
+        # Get the data from the request body
+        data = json.loads(request.body.decode("utf-8"))
+        selected_session = data.get("session")
+        student_number = data.get("studentNumber")
+
+        print(selected_session, student_number)
+
+        # Query the database using the received data
+        if selected_session and student_number:
+            exams = Exams.objects.filter(
+                Q(student_id__student_number__iexact=student_number) &
+                Q(unit_id__time_id__time_code__iexact=selected_session)
+            )
+        else:
+            exams = Exams.objects.none()  # Return an empty result set
+
+        # Prepare the search results as JSON
+        search_results = []
+        for exam in exams:
+            search_results.append({
+                "student_id": {"student_number": exam.student_id.student_number},
+                "unit_id": {"unit_name": exam.unit_id.unit_name},
+                "grade": exam.grade,
+                "remarks": exam.remarks,
+            })
+
+        return JsonResponse(search_results, safe=False)  # Return search results as JSON
+
+    return render(request, 'your_template.html')  # Render the initial page
