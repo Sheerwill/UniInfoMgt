@@ -39,6 +39,7 @@ def staff_dashboard_view(request):
     # Staff dashboard logic
     return render(request, 'staff_dashboard.html')
 
+@login_required
 def student_dashboard_view(request):
     # Student dashboard logic
     return render(request, 'student_dashboard.html')
@@ -52,7 +53,7 @@ def signup(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('home')  
+            return redirect('student_dashboard')  
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
