@@ -61,11 +61,11 @@ def signup(request):
 
 @login_required
 @user_passes_test(is_staff)
-def search_exams(request):    
-    search_query = request.GET.get("search_query")
+def search_examinations(request):    
+    search_query = request.GET.get("search_query")    
     if search_query:
         # Perform a search based on the related model's attribute
-        results = Exams.objects.filter(unit_id__unit_code__exact=search_query)
+        results = Exams.objects.filter(unit_id__unit_code__exact=search_query)        
     else:
         # If no query provided
         results = []
@@ -105,7 +105,7 @@ class PostPercentagesView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)})
 
-
+#Student's portal
 @login_required
 def search_exams(request):
     if request.method == "POST":
@@ -135,6 +135,4 @@ def search_exams(request):
                 "remarks": exam.remarks,
             })
 
-        return JsonResponse(search_results, safe=False)  # Return search results as JSON
-
-    return render(request, 'your_template.html')  # Render the initial page
+        return JsonResponse(search_results, safe=False)  # Return search results as JSON   

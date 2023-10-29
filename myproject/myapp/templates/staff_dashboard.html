@@ -42,12 +42,12 @@
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent the default form submission            
     
-            const searchQuery = document.getElementById('searchQuery').value;
+            const searchQuery = document.getElementById('searchQuery').value;            
     
             fetch(`/search/?search_query=${searchQuery}`)
-                .then(response => response.json())
+                .then(response => response.json())                
                 .then(data => {
-                    if ('results' in data) {
+                    if ('results' in data) {                        
                         updateTable(data.results);                        
                         if (data.results.length === 0) {
                             // Show the alert if no results are found

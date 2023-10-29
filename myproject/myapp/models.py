@@ -173,41 +173,50 @@ class Exams(models.Model):
         super(Exams, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.unit_id.unit_name} - {self.student_id} - Grade: {self.grade} - Remarks: {self.remarks}'
+        return f'{self.unit_id.unit_name} - {self.student_id} - {self.percentage} - Grade: {self.grade} - Remarks: {self.remarks}'
 
     class Meta:
         verbose_name_plural = "Exams"
 
+#Students will register for graduation
+#This reduces the amount of computations made just by one entry into the exams model
 class StudentClassification(models.Model):
     faculty_id = models.ForeignKey(Faculties, on_delete=models.PROTECT, default=None)
     course_id = models.ForeignKey(Courses, on_delete=models.PROTECT, default=None)
     program_id = models.ForeignKey(Programs, on_delete=models.CASCADE, default=None)
     batch_id = models.ForeignKey(Batches, on_delete=models.CASCADE, default=None)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE, default=None)
-    average_marks = models.DecimalField(max_digits=5, decimal_places=1)
-    classification = models.CharField(max_length=100)
+    average_marks = models.DecimalField(max_digits=5, decimal_places=1, blank=True, default=0.0)
+    classification = models.CharField(max_length=100, blank=True, editable=False)
 
     def calculate_classification(self):
-        exams = Exams.objects.filter(student_id=self.student_id, program_id=self.program_id)
+        program_id = self.program_id
+        exams = Exams.objects.filter(student_id=self.student_id, student_id__batch_id__program_id=program_id)       
 
-        if not exams:
+        if not exams:            
             self.classification = ''  # No exams available
-            return
+            self.average_marks = 0.0  # Set a default value when no exams are available
+            return                          
 
         total_marks = sum(exam.percentage for exam in exams)
+        
         average_marks = total_marks / len(exams)
 
+        self.average_marks = average_marks        
+
         # Retrieve program_type from the associated program
-        program_type = self.program_id.program_type
+        program_type = program_id.program_type 
+              
 
         # Calculate classification based on program type and average marks
-        if program_type == 'Postgraduate':
+        if program_type == 'postgraduate':
             if average_marks >= 50:
                 self.classification = 'Pass'
             else:
                 self.classification = 'Fail'
-        elif program_type == 'Undergraduate':
+        elif program_type == 'undergraduate':
             if average_marks >= 70:
+                print('yaa2y')
                 self.classification = '1st Class Honors'
             elif 60 <= average_marks <= 69:
                 self.classification = '2nd Class Honors Upper Division'
@@ -215,7 +224,9 @@ class StudentClassification(models.Model):
                 self.classification = '2nd Class Honors Lower Division'
             elif 40 <= average_marks <= 49:
                 self.classification = 'Pass'
-        elif program_type in ['Certificate', 'Diploma']:
+            else:
+                self.classification = ''
+        elif program_type in ['certificate', 'diploma']:
             if average_marks >= 70:
                 self.classification = 'Distinction'
             elif 55 <= average_marks <= 69:
