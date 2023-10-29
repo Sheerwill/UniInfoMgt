@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
-from .forms import SignupForm, Exams, GraduationForm, ExamRegistrationForm
+from .forms import SignupForm, GraduationForm, ExamRegistrationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse, request
@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 import json
 from django.db.models import Q
 from django.contrib import messages
+from .models import Exams, StudentClassification
 
 
 class CustomLoginView(LoginView):
@@ -113,9 +114,7 @@ def search_exams(request):
         # Get the data from the request body
         data = json.loads(request.body.decode("utf-8"))
         selected_session = data.get("session")
-        student_number = data.get("studentNumber")
-
-        print(selected_session, student_number)
+        student_number = data.get("studentNumber")        
 
         # Query the database using the received data
         if selected_session and student_number:
@@ -159,3 +158,36 @@ def register_for_exams(request):
         form = ExamRegistrationForm()
 
     return render(request, 'register_exams.html', {'form': form})
+
+@login_required
+def graduation_search(request):
+    # Student dashboard logic
+    return render(request, 'graduation_status.html')
+
+def query_student_classification(request):
+    if request.method == 'POST':        
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            student_id = data.get('student_id')
+            program_id = data.get('program_id')
+
+            #print(student_id, program_id)
+            if student_id and program_id:
+                student_classification = get_object_or_404(StudentClassification, student_id__student_number=student_id, program_id__program_code=program_id)
+                # Serialize the student_classification object
+                data = {
+                    'faculty_id': student_classification.faculty_id.faculty_name,
+                    'course_id': student_classification.course_id.course_name,
+                    'program_id': student_classification.program_id.program_code,
+                    'batch_id': student_classification.batch_id.batch_code,
+                    'student_id': student_classification.student_id.student_name,
+                    'average_marks': student_classification.average_marks,
+                    'classification': student_classification.classification
+                }
+                return JsonResponse(data)
+            else:
+                return JsonResponse({'error': 'Missing or invalid parameters'})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'})
+
+    return JsonResponse({'error': 'Invalid request method'})

@@ -1,0 +1,134 @@
+{% extends "student_dashboard.html" %}
+
+{% block nav %}
+<div style="margin: 0 auto;">
+    <p class="h1">Graduation Query</p>
+</div> 
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button class="btn btn-danger ml-auto" style="margin-right: 10px;" type="submit">Logout</button>
+  </form>  
+{% endblock %}
+
+{% block content %}
+<body>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="input-group mb-3">
+            <div class="input-group-text p-0">
+              <select class="form-select form-select-lg shadow-none bg-light border-0">
+                <option>EEEQ</option>
+                <option>EEEI</option>
+                <option>MMM</option>
+                <option>BOQ</option>
+                <option>BOM</option>                
+              </select>
+            </div>
+            <input id="searchInput" type="text" class="form-control" placeholder="Enter student number...">
+            <button id="searchButton" class="input-group-text shadow-none px-4 btn-success">
+              <i class="bi bi-search me-2"></i> Search
+            </button>
+        </div>
+    </div> 
+</div>
+
+<div id="noResultsAlert" class="alert alert-warning"  style="display: none;">
+    No results found.
+</div>
+
+<div class="mx-auto">
+    <table class="table" style="display: none;">
+        <thead>
+            <tr>
+                <th>faculty</th>
+                <th>Course</th>
+                <th>Program</th>
+                <th>Batch</th>
+                <th>Student</th>
+                <th>Average Marks</th>
+                <th>Classification</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults">
+            {# Insert the search results here using JavaScript #}
+        </tbody>
+    </table>        
+</div>  
+</body>
+<script>
+    function searchFunction() {
+        // Get the selected session from the dropdown
+        var selectedProgram = document.querySelector(".form-select").value;
+    
+        // Get the student number input value
+        var studentNumber = document.getElementById("searchInput").value;        
+    
+        // Perform the search based on the selected session and student number
+        // You can implement your search logic here
+        var data = {
+            student_id: studentNumber,
+            program_id: selectedProgram
+        };        
+    
+        var headers = {
+            "X-CSRFToken": getCookie('csrftoken'),
+            "Content-Type": "application/json"
+        };
+    
+        fetch('http://127.0.0.1:8000/query-student-classification/', {
+            method: 'POST',
+            body: JSON.stringify(data), // Convert the data to a JSON string
+            headers: headers
+        })
+        .then(response => response.json())        
+        .then(data => {
+            var table = document.querySelector(".table");
+            var tbody = table.querySelector("tbody");
+    
+            // Clear any existing search results
+            tbody.innerHTML = "";
+    
+            if (data.error) {
+                // Handle the error case
+                document.getElementById("noResultsAlert").textContent = data.error;
+                document.getElementById("noResultsAlert").style.display = "block";
+            } else {
+                // Insert search results into the table                
+                var row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${data.student_id}</td>
+                    <td>${data.program_id}</td>
+                    <td>${data.faculty_id}</td>
+                    <td>${data.course_id}</td>
+                    <td>${data.batch_id}</td>
+                    <td>${data.average_marks}</td>
+                    <td>${data.classification}</td>
+                `;
+                tbody.appendChild(row);
+
+                // Show the table
+                table.style.display = "table";
+    
+                // Hide the "noResultsAlert" if results are found
+                document.getElementById("noResultsAlert").style.display = "none";
+            }
+        });
+    }
+    
+    // Get the "Search" button by its ID
+    var searchButton = document.getElementById("searchButton");
+    
+    // Attach a click event listener to the button
+    searchButton.addEventListener("click", function() {
+        // Call the searchFunction when the button is clicked
+        searchFunction();
+    });
+
+    function getCookie(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+</script>      
+{% endblock %}
