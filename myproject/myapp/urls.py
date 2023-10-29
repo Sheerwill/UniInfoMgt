@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (CustomLoginView, staff_dashboard_view, student_dashboard_view, signup,
                     search_exams, search_examinations, custom_logout, PostPercentagesView,
                     register_for_graduation, register_for_exams, graduation_search,
-                    query_student_classification, export_student_classification_to_csv)
+                    query_student_classification, export_student_classification_to_csv, export_csv)
 
 
 urlpatterns = [
@@ -19,4 +19,5 @@ urlpatterns = [
     path('search_graduation/', graduation_search, name='search_graduation'),
     path('query-student-classification/', query_student_classification, name='query_student_classification'),
     path('export-student-classification/', export_student_classification_to_csv, name='export_student_classification_to_csv'),
+    path('export-csv/', export_csv, name='export_csv'),
 ]

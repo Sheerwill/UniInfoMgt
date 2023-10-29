@@ -91,8 +91,7 @@ class PostPercentagesView(View):
     def post(self, request):
         try:
             data = json.loads(request.body.decode('utf-8'))  # Parse the JSON data            
-            for item in data["data"]:
-                print(json.dumps(data, indent=4))                
+            for item in data["data"]:                                
                 record_id = int(item['record_id'])
                 percentage = int(item['percentage'])
 
@@ -168,8 +167,7 @@ def query_student_classification(request):
             data = json.loads(request.body.decode("utf-8"))
             student_id = data.get('student_id')
             program_id = data.get('program_id')
-
-            #print(student_id, program_id)
+            
             if student_id and program_id:
                 student_classification = get_object_or_404(StudentClassification, student_id__student_number=student_id, program_id__program_code=program_id)
                 # Serialize the student_classification object
@@ -189,6 +187,26 @@ def query_student_classification(request):
             return JsonResponse({'error': 'Invalid JSON data'})
 
     return JsonResponse({'error': 'Invalid request method'})
+
+def export_csv(request):
+    search_query = request.GET.get("search_query")
+
+    if search_query:
+        # Filter the Exam model using the search query
+        exams = Exams.objects.filter(unit_id__unit_code__exact=search_query)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="exam_results.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Unit Code', 'Student Name', 'Percentage', 'Grade', 'Remarks'])
+
+        for exam in exams:
+            writer.writerow([exam.unit_id.unit_code, exam.student_id.student_name, exam.percentage, exam.grade, exam.remarks])
+
+        return response
+
+    return HttpResponse("No data to export.")
 
 def export_student_classification_to_csv(request):
     # Query the data you want to export

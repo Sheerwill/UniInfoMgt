@@ -31,7 +31,9 @@
     <div id="results-table-container" class="table-container d-flex justify-content-center">
         
     </div> 
-    <button id="post-button" class="btn btn-primary btn-lg float-right" style = "display: none">Post</button>   
+    <button id="post-button" class="btn btn-primary btn-lg float-right" style="display: none">Post</button>
+    <button id="csv-button" class="btn btn-primary btn-lg float-right mt-3" style="display: none; clear: both;">Get CSV File</button>
+
 </div>
 
 <script>
@@ -110,6 +112,9 @@
                 // Show the "Post" button
                 var postButton = document.getElementById("post-button");
                 postButton.style.display = "block";
+
+                var postButton = document.getElementById("csv-button");
+                postButton.style.display = "block";
             }
         
             tableContainer.innerHTML = ''; // Clear any previous table
@@ -149,7 +154,7 @@
             .then(response => response.json())            
             .then(data => {
                 if (data.success) {
-                    alert('Percentages saved successfully.');
+                    alert('Percentages saved successfully.');                    
                 } else {
                     alert(data.error);
                 }
@@ -170,6 +175,16 @@
         var parts = value.split('; ' + name + '=');
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
+
+    document.getElementById('csv-button').addEventListener('click', function() {
+        // Create a link element
+        var link = document.createElement('a');
+        link.href = "{% url 'export_csv' %}";
+        link.download = 'exam_results.csv';
+        
+        // Simulate a click on the link
+        link.click();
+    });
     
 </script>
 

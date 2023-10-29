@@ -6,10 +6,13 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 #No batches for the same reason, No units
 class Faculties(models.Model):
     faculty_code = models.CharField(max_length=255)
-    faculty_name = models.CharField(max_length=255) 
+    faculty_name = models.CharField(max_length=255)     
 
     class Meta:
         verbose_name_plural = "Faculties"
+
+    def __str__(self):
+        return self.faculty_code
 
 #Courses e.g Electrical, Mechanical
 #No batches as they're under programs, units also
@@ -20,6 +23,9 @@ class Courses(models.Model):
 
     class Meta:
         verbose_name_plural = "Courses"
+
+    def __str__(self):
+        return self.course_code
 
 #Programs e.g EEEQ, EEEI ...
 class Programs(models.Model):
@@ -36,6 +42,9 @@ class Programs(models.Model):
 
     class Meta:
         verbose_name_plural = "Programs"
+
+    def __str__(self):
+        return self.program_code
 
 #Year and semester e.g 1.1, 1.2, 2.1, 2.2
 class Time(models.Model):
@@ -56,13 +65,13 @@ class Time(models.Model):
     def save(self, *args, **kwargs):
         # Generate the time_code in the "year.semester" format
         self.time_code = f"{self.year}.{self.semester}"
-        super(Time, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Year: {self.year}, Semester: {self.semester}, Time Code: {self.time_code}"
+        super(Time, self).save(*args, **kwargs)   
     
     class Meta:
         verbose_name_plural = "Times"
+
+    def __str__(self):
+        return self.time_code
     
 #Batches alphanumeric field e.g. 2013S or 2013PS ...
 class Batches(models.Model):    
@@ -73,6 +82,9 @@ class Batches(models.Model):
     class Meta:
         verbose_name_plural = "Batches"
 
+    def __str__(self):
+        return self.batch_code
+
 #students in a given batch
 class Students(models.Model):    
     student_number = models.CharField(max_length=255, unique=True)
@@ -80,10 +92,10 @@ class Students(models.Model):
     batch_id = models.ManyToManyField(Batches)      
 
     def __str__(self):        
-        return f"Student Number: {self.student_number}, Student Name: {self.student_name}"  
+        return self.student_number 
     
     class Meta:
-        verbose_name_plural = "Students"
+        verbose_name_plural = "Students"   
 
 #lecturers in a given course
 #Upwards reference is made. Units a lecturer teaches are in Units
@@ -94,10 +106,10 @@ class Lecturers(models.Model):
     batch_id = models.ManyToManyField(Batches) #One lecturer can teach multiple batches    
 
     def __str__(self):
-        return self.lecturer_name
+        return self.lecturer_number
     
     class Meta:
-        verbose_name_plural = "Lecturers"
+        verbose_name_plural = "Lecturers"   
   
 
 #units in a given program
@@ -215,8 +227,7 @@ class StudentClassification(models.Model):
             else:
                 self.classification = 'Fail'
         elif program_type == 'undergraduate':
-            if average_marks >= 70:
-                print('yaa2y')
+            if average_marks >= 70:                
                 self.classification = '1st Class Honors'
             elif 60 <= average_marks <= 69:
                 self.classification = '2nd Class Honors Upper Division'
