@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import StudentClassification
+from .models import StudentClassification, Exams
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField()
@@ -15,3 +15,7 @@ class GraduationForm(forms.ModelForm):
         model = StudentClassification
         fields = ['faculty_id', 'course_id', 'program_id', 'batch_id', 'student_id']
 
+class ExamRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Exams
+        fields = ['unit_id', 'student_id']

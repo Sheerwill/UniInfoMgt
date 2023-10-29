@@ -1,10 +1,9 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, authenticate, logout
-from .forms import SignupForm, GraduationForm
+from .forms import SignupForm, Exams, GraduationForm, ExamRegistrationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Exams
 from django.http import JsonResponse, request
 from django.core import serializers
 from django.urls import reverse
@@ -149,3 +148,14 @@ def register_for_graduation(request):
         form = GraduationForm()
 
     return render(request, 'register_graduation.html', {'form': form})
+
+def register_for_exams(request):
+    if request.method == 'POST':
+        form = ExamRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            return JsonResponse({'success': True})          
+    else:
+        form = ExamRegistrationForm()
+
+    return render(request, 'register_exams.html', {'form': form})

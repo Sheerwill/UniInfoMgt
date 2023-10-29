@@ -18,12 +18,12 @@
           data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
           aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span> <!-- Bootstrap's hamburger icon -->
-          Graduation
+          Exams & Graduation
         </button>
       </nav>
       <div class="collapse" id="navbarToggleExternalContent">
         <div class="bg-light shadow-3 p-4">
-            <button id = "view-graduation" class="btn btn-link btn-block border-bottom m-0">Register for Exams</button>
+            <button id = "register-exams" class="btn btn-link btn-block border-bottom m-0">Register for Exams</button>
             <button id = "register-graduation" class="btn btn-link btn-block border-bottom m-0">Register For Graduation</button>
             <button id = "view-graduation" class="btn btn-link btn-block border-bottom m-0">View Graduation Status</button>          
         </div>
@@ -154,6 +154,11 @@
     document.getElementById("register-graduation").addEventListener("click", function() {
         // Redirect to the new page
         window.location.href = "http://127.0.0.1:8000/register-graduation/";
+    });
+
+    document.getElementById("register-exams").addEventListener("click", function() {
+        // Redirect to the new page
+        window.location.href = "http://127.0.0.1:8000/register-exams/";
     });
   
 </script>      
