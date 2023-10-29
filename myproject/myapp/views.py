@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, authenticate, logout
-from .forms import SignupForm
+from .forms import SignupForm, GraduationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Exams
@@ -13,6 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from django.db.models import Q
+from django.contrib import messages
+
 
 class CustomLoginView(LoginView):
     def form_valid(self, form):
@@ -135,4 +137,15 @@ def search_exams(request):
                 "remarks": exam.remarks,
             })
 
-        return JsonResponse(search_results, safe=False)  # Return search results as JSON   
+        return JsonResponse(search_results, safe=False)  # Return search results as JSON
+    
+def register_for_graduation(request):
+    if request.method == 'POST':
+        form = GraduationForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            return JsonResponse({'success': True})          
+    else:
+        form = GraduationForm()
+
+    return render(request, 'register_graduation.html', {'form': form})

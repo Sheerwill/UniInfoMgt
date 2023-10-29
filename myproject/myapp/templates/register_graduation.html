@@ -1,0 +1,73 @@
+{% extends "student_dashboard.html" %}
+
+{% block nav %}
+<div style="margin: 0 auto;">
+    <p class="h1">Graduation Portal</p>
+</div> 
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button class="btn btn-danger ml-auto" style="margin-right: 10px;" type="submit">Logout</button>
+  </form>  
+{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Register for Graduation</title>
+</head>
+<body class="text-center">
+    <div class="container">
+
+        <a href="{% url 'student_dashboard' %}">
+            <i class="home-icon fas fa-home fa-lg mx-auto my-auto"></i> Back To Home
+        </a>       
+
+        <form id="registration-form" method="post" class="form-signin">
+            <h1 class="display-4 text-primary mb-4">Register for Graduation</h1>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-lg btn-primary" type="submit">Submit</button>
+        </form>
+
+        <div id="success-message" class="alert alert-success" role="alert" style="display: none;">
+            Congratulations! You have successfully registered for graduation.
+        </div>        
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("registration-form");
+            var successMessage = document.getElementById("success-message");
+    
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                
+                // Send an AJAX request to the server
+                fetch('http://127.0.0.1:8000/register-graduation/', {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Form submission was successful
+                        form.style.display = "none";
+                        successMessage.style.display = "block";                        
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+{% endblock %}
+
+

@@ -225,7 +225,7 @@ class StudentClassification(models.Model):
             elif 40 <= average_marks <= 49:
                 self.classification = 'Pass'
             else:
-                self.classification = ''
+                self.classification = 'Fail'
         elif program_type in ['certificate', 'diploma']:
             if average_marks >= 70:
                 self.classification = 'Distinction'
