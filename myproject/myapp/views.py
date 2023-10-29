@@ -3,17 +3,15 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from .forms import SignupForm, GraduationForm, ExamRegistrationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse, request
-from django.core import serializers
+from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from django.db.models import Q
-from django.contrib import messages
 from .models import Exams, StudentClassification
+import csv
 
 
 class CustomLoginView(LoginView):
@@ -191,3 +189,28 @@ def query_student_classification(request):
             return JsonResponse({'error': 'Invalid JSON data'})
 
     return JsonResponse({'error': 'Invalid request method'})
+
+def export_student_classification_to_csv(request):
+    # Query the data you want to export
+    data = StudentClassification.objects.all()
+
+    # Create a CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="student_classification.csv"'
+
+    # Create a CSV writer
+    writer = csv.writer(response)
+    writer.writerow(['Faculty', 'Course', 'Program', 'Batch', 'Student', 'Average Marks', 'Classification'])  # Header row
+
+    for item in data:
+        writer.writerow([
+            item.faculty_id.faculty_name,
+            item.course_id.course_name,
+            item.program_id.program_code,
+            item.batch_id.batch_code,
+            item.student_id.student_name,
+            item.average_marks,
+            item.classification
+        ])
+
+    return response
