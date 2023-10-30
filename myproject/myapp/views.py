@@ -189,11 +189,11 @@ def query_student_classification(request):
     return JsonResponse({'error': 'Invalid request method'})
 
 def export_csv(request):
-    search_query = request.GET.get("search_query")
+    searchQuery = request.GET.get("searchQuery")    
 
-    if search_query:
+    if searchQuery:
         # Filter the Exam model using the search query
-        exams = Exams.objects.filter(unit_id__unit_code__exact=search_query)
+        exams = Exams.objects.filter(unit_id__unit_code__exact=searchQuery)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="exam_results.csv"'

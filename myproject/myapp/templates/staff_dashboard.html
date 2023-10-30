@@ -40,11 +40,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('searchForm');
         const noResultsAlert = document.getElementById('noResultsAlert');
+        let searchQuery;
     
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent the default form submission            
     
-            const searchQuery = document.getElementById('searchQuery').value;            
+            searchQuery = document.getElementById('searchQuery').value;            
     
             fetch(`/search/?search_query=${searchQuery}`)
                 .then(response => response.json())                
@@ -177,11 +178,13 @@
     }
 
     document.getElementById('csv-button').addEventListener('click', function() {
-        // Create a link element
-        var link = document.createElement('a');
-        link.href = "{% url 'export_csv' %}";
-        link.download = 'exam_results.csv';
+        const searchQuery = document.getElementById('searchQuery').value;
         
+        // Create a link element with the searchQuery as a query parameter
+        var link = document.createElement('a');
+        link.href = `/export-csv/?searchQuery=${searchQuery}`;
+        link.download = 'exam_results.csv';
+    
         // Simulate a click on the link
         link.click();
     });
