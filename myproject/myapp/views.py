@@ -149,8 +149,22 @@ def register_for_exams(request):
     if request.method == 'POST':
         form = ExamRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()  # Save the form data to the database
-            return JsonResponse({'success': True})          
+            student_id = form.cleaned_data['student_id']
+            unit_id = form.cleaned_data['unit_id']
+
+            # Check if an exam record already exists for this student and unit
+            existing_exam = Exams.objects.filter(student_id=student_id, unit_id=unit_id).first()
+
+            if existing_exam:
+                return JsonResponse({'success': False})
+
+            # If no existing exam, save the new record
+            form.save()
+            return JsonResponse({'success': True})
+
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid form data.'})
+
     else:
         form = ExamRegistrationForm()
 
