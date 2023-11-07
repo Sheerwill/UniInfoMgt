@@ -135,7 +135,21 @@ class Exams(models.Model):
     unit_id = models.ForeignKey(Units, on_delete=models.PROTECT, default=None)  
     #Exams are taken by individuals not batches  
     student_id = models.ForeignKey(Students, on_delete=models.PROTECT)    
-    percentage = models.IntegerField(blank=True, default=00)
+    percentage = models.DecimalField(
+        max_digits=3,
+        decimal_places=0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(100),
+        ],
+        blank=True,
+        default=0
+    )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+        
     grade = models.CharField(max_length=4, choices=[('', None), ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E')], blank=True, default=None, editable=False)
     remarks = models.CharField(max_length=100, blank=True, editable=False)
 

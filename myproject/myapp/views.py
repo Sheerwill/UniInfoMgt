@@ -91,25 +91,30 @@ def search_examinations(request):
 
     return JsonResponse({'results': results_data})  
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class PostPercentagesView(View):
     def post(self, request):
         try:
-            data = json.loads(request.body.decode('utf-8'))  # Parse the JSON data            
-            for item in data["data"]:                                
+            data = json.loads(request.body.decode('utf-8'))  # Parse the JSON data
+
+            for item in data["data"]:
                 record_id = int(item['record_id'])
                 percentage = int(item['percentage'])
 
                 # Find the corresponding Exams record using the record_id
                 exam = Exams.objects.get(pk=record_id)
-                exam.percentage = percentage  # Update the percentage field
-                exam.save()  # Save the changes
+
+                # Validate the percentage before updating the record
+                if 0 <= percentage <= 100:
+                    exam.percentage = percentage  # Update the percentage field
+                    exam.save()  # Save the changes
+                else:
+                    return JsonResponse({'error': 'Invalid percentage value'})
 
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'error': str(e)})
-
+        
 #Student's portal
 @login_required
 def search_exams(request):
