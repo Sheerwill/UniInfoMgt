@@ -1,10 +1,10 @@
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetCompleteView
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from .forms import SignupForm, GraduationForm, ExamRegistrationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse, HttpResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -33,6 +33,10 @@ def custom_logout(request):
 # Define a custom check to identify staff users
 def is_staff(user):
     return user.is_staff
+
+'''def custom_reset_done_view(request):
+    # Define your custom logic here, such as redirection to the root URL
+    return redirect(reverse('custom_login'))'''
 
 @login_required
 @user_passes_test(is_staff)
