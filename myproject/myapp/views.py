@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, PasswordResetCompleteView
+from django.contrib.auth.views import LoginView, PasswordResetView
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from .forms import SignupForm, GraduationForm, ExamRegistrationForm
@@ -12,6 +12,8 @@ import json
 from django.db.models import Q
 from .models import Exams, StudentClassification
 import csv
+from django.contrib.auth.models import User
+from django.contrib.messages import error
 
 
 class CustomLoginView(LoginView):
@@ -61,7 +63,7 @@ def signup(request):
             return redirect('student_dashboard')  
     else:
         form = SignupForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
 
 @login_required
 @user_passes_test(is_staff)
@@ -250,3 +252,19 @@ def export_student_classification_to_csv(request):
         ])
 
     return response
+
+class CustomPasswordResetView(PasswordResetView):
+    email_template_name = 'registration/password_reset_email.html'    
+    template_name = 'registration/password_reset_form.html'
+    success_url = reverse_lazy('password_reset_done')
+
+    def form_valid(self, form):
+        print("Yaaay")
+        email = form.cleaned_data['email']
+        if not User.objects.filter(email=email).exists():
+            # Email doesn't exist in the database
+            error(self.request, 'This email is not registered.')
+            return self.render_to_response(
+                self.get_context_data(form=form, unregistered_email=True)
+            )
+        return super().form_valid(form)
