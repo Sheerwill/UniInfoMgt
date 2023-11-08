@@ -35,7 +35,7 @@ class Programs(models.Model):
         ('undergraduate', 'Undergraduate'),
         ('postgraduate', 'Postgraduate'),
     ]
-    program_code = models.CharField(max_length=255)
+    program_code = models.CharField(max_length=255, unique=True)
     program_name = models.CharField(max_length=255) #e.g B.Eng, B.Sci, B.Tech
     program_type = models.CharField(max_length=20, choices=PROGRAM_TYPE_CHOICES) #e.g cert, dip, undergrad, pstgrad    
     course_id = models.ForeignKey(Courses, on_delete=models.PROTECT, default=None)
@@ -213,8 +213,8 @@ class StudentClassification(models.Model):
     batch_id = models.ForeignKey(Batches, on_delete=models.CASCADE, default=None)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE, default=None)
     average_marks = models.DecimalField(max_digits=5, decimal_places=1, blank=True, default=0.0)
-    classification = models.CharField(max_length=100, blank=True, editable=False)
-
+    classification = models.CharField(max_length=100, blank=True, editable=False)    
+        
     def calculate_classification(self):
         program_id = self.program_id
         exams = Exams.objects.filter(student_id=self.student_id, student_id__batch_id__program_id=program_id)       
@@ -268,3 +268,4 @@ class StudentClassification(models.Model):
     
     class Meta:
         verbose_name_plural = "StudentClassifications"
+        unique_together = ('student_id', 'program_id')

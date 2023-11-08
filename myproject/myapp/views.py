@@ -14,6 +14,8 @@ from .models import Exams, StudentClassification
 import csv
 from django.contrib.auth.models import User
 from django.contrib.messages import error
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 
 
 class CustomLoginView(LoginView):
@@ -149,12 +151,18 @@ def register_for_graduation(request):
     if request.method == 'POST':
         form = GraduationForm(request.POST)
         if form.is_valid():
-            form.save()  # Save the form data to the database
-            return JsonResponse({'success': True})          
+            form.save()  # Attempt to save the form data
+            return JsonResponse({'success': True})
+
+        else:
+            # Form is not valid, return 'false'
+            return JsonResponse({'success': False})
     else:
         form = GraduationForm()
 
-    return render(request, 'register_graduation.html', {'form': form})
+    # Render the form with or without error message
+    return render(request, 'register_graduation.html', {'form': form})    
+
 
 def register_for_exams(request):
     if request.method == 'POST':
@@ -167,6 +175,7 @@ def register_for_exams(request):
             existing_exam = Exams.objects.filter(student_id=student_id, unit_id=unit_id).first()
 
             if existing_exam:
+                print("YAAAAAY")
                 return JsonResponse({'success': False})
 
             # If no existing exam, save the new record
@@ -187,14 +196,21 @@ def graduation_search(request):
     return render(request, 'graduation_status.html')
 
 def query_student_classification(request):
-    if request.method == 'POST':        
+    if request.method == 'POST':
         try:
             data = json.loads(request.body.decode("utf-8"))
             student_id = data.get('student_id')
             program_id = data.get('program_id')
-            
+
             if student_id and program_id:
-                student_classification = get_object_or_404(StudentClassification, student_id__student_number=student_id, program_id__program_code=program_id)
+                try:
+                    student_classification = StudentClassification.objects.get(
+                        student_id__student_number=student_id,
+                        program_id__program_code=program_id
+                    )
+                except ObjectDoesNotExist:
+                    return JsonResponse({'error': 'No data found for the given parameters'})
+                
                 # Serialize the student_classification object
                 data = {
                     'faculty_id': student_classification.faculty_id.faculty_name,
@@ -210,7 +226,7 @@ def query_student_classification(request):
                 return JsonResponse({'error': 'Missing or invalid parameters'})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'})
-
+    
     return JsonResponse({'error': 'Invalid request method'})
 
 def export_csv(request):

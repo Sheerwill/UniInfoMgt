@@ -34,12 +34,16 @@
 
         <div id="success-message" class="alert alert-success" role="alert" style="display: none;">
             Congratulations! You have successfully registered for graduation.
-        </div>        
+        </div>  
+        <div id="registered-message" class="alert alert-success" role="alert" style="display: none;">
+            You have already registered for graduation.
+        </div>      
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var form = document.getElementById("registration-form");
             var successMessage = document.getElementById("success-message");
+            var registeredMessage = document.getElementById("registered-message");
     
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
@@ -52,12 +56,18 @@
                         'X-CSRFToken': '{{ csrf_token }}',
                     }
                 })
-                .then(response => response.json())
+                .then(response => response.json())                
                 .then(data => {
+                    console.log(data);
                     if (data.success) {
                         // Form submission was successful
                         form.style.display = "none";
                         successMessage.style.display = "block";                        
+                    }
+                    else{
+                        console.log("Yaaaay");
+                        form.style.display = "none";
+                        registeredMessage.style.display = "block";
                     }
                 });
             });
