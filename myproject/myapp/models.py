@@ -146,13 +146,12 @@ class Exams(models.Model):
         default=0
     )
 
-    def save(self, *args, **kwargs):
+    '''def save(self, *args, **kwargs):
         self.full_clean()
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)'''
         
     grade = models.CharField(max_length=4, choices=[('', None), ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E')], blank=True, default=None, editable=False)
     remarks = models.CharField(max_length=100, blank=True, editable=False)
-
     
     def save(self, *args, **kwargs):
         # Calculate grade and remarks
@@ -203,6 +202,7 @@ class Exams(models.Model):
 
     class Meta:
         verbose_name_plural = "Exams"
+        unique_together = ('unit_id', 'student_id')
 
 #Students will register for graduation
 #This reduces the amount of computations made just by one entry into the exams model
