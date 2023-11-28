@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'unidatabase',
         'USER': 'root',
         'PASSWORD': 'Willmade6119$',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode = 'STRICT_TRANS_TABLES'"

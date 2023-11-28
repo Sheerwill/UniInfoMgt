@@ -269,8 +269,7 @@ class CustomPasswordResetView(PasswordResetView):
     template_name = 'registration/password_reset_form.html'
     success_url = reverse_lazy('password_reset_done')
 
-    def form_valid(self, form):
-        print("Yaaay")
+    def form_valid(self, form):        
         email = form.cleaned_data['email']
         if not User.objects.filter(email=email).exists():
             # Email doesn't exist in the database
